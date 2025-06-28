@@ -1,5 +1,4 @@
 import pytest
-
 from main import BooksCollector
 
 class TestBooksCollector:
@@ -34,29 +33,30 @@ class TestBooksCollector:
         collector.add_book_in_favorites(book_name)
         assert len(collector.get_list_of_favorites_books()) == 1
 
-    def test_get_books_with_specific_genre_age_rating(self, collector):
-        book_name_specific_genre = ['Оно','Шерлок Холмс']
-        genre_specific = ['Ужасы','Детективы']
-        collector.add_new_book(book_name_specific_genre)
-        collector.set_book_genre(book_name_specific_genre, genre_specific)
-        specific_genre = collector.get_books_genre[book_name_specific_genre]
-        assert len(collector.get_books_with_specific_genre()) == 2
+    def test_get_books_with_specific_genre_detektive(self, collector):
+        collector.add_new_book('Шерлок Холмс')
+        collector.add_new_book('Собака Баскервилей')
+        collector.set_book_genre('Шерлок Холмс', 'Детективы')
+        collector.set_book_genre('Собака Баскервилей', 'Детективы')
+        assert (collector.get_books_with_specific_genre('Детективы') == ['Шерлок Холмс', 'Собака Баскервилей'])
 
     def test_delete_book_from_favorites(self, collector):
         book_name = 'Шерлок Холмс'
         collector.add_new_book(book_name)
         collector.add_book_in_favorites(book_name)
-        favorite = collector.get_list_of_favorites_books
         collector.delete_book_from_favorites(book_name)
         assert len(collector.get_list_of_favorites_books()) == 0
 
-    def test_get_books_for_children_not_age_rating(self, collector):
-        genre_age_rating = ['Ужасы', 'Детективы']
-        books_for_children = 'Маугли'
-        collector.add_new_book(books_for_children)
-        genre = 'Мультфильмы'
-        collector.set_book_genre(books_for_children, genre)
-        assert collector.get_books_for_children not in genre_age_rating
+    @pytest.mark.parametrize('book_name, genre',
+    [
+        ['Маугли', 'Мультфильмы'],
+        ['1984', 'Фантастика']
+    ]
+    )
+    def test_get_books_for_children_cartoon_fantasy(self, collector, book_name, genre):
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, genre)
+        assert collector.get_books_for_children() == [book_name]
 
     def test_get_list_of_favorites_books_list(self, collector):
         collector.add_new_book('Парфюмер')
@@ -65,3 +65,9 @@ class TestBooksCollector:
         collector.add_book_in_favorites('Шерлок Холмс')
         assert len(collector.get_list_of_favorites_books()) == 2
 
+    def test_get_books_genre(self, collector):
+        collector.add_new_book('Шерлок Холмс')
+        collector.set_book_genre('Шерлок Холмс', 'Детективы')
+        collector.add_new_book('Парфюмер')
+        collector.set_book_genre('Парфюмер', 'Роман')
+        assert len(collector.get_books_genre()) == 2
